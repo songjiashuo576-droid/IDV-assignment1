@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>PSI Readings</title>
+  <style>
+    table { border-collapse: collapse; }
+    th, td { border: 1px solid #999; padding: 6px 12px; text-align: center; }
+  </style>
+</head>
+<body>
+  <h1>Singapore PSI Readings</h1>
+  <p id="time"></p >
+  <table id="psi-table"></table>
+
+  <script>
+    const URL = "https://api-open.data.gov.sg/v2/real-time/api/psi";
+    const regions = ["north", "south", "east", "west", "central"];
+
+    fetch(URL)
+      .then(res => res.json())
+      .then(json => {
+        const item = json.data.items[0];
+        document.getElementById("time").textContent = "Timestamp: " + item.timestamp;
+
+        const table = document.getElementById("psi-table");
+        let html = "<tr><th>Reading</th>" + regions.map(r => `<th>${r}</th>`).join("") + "</tr>";
+        for (const [name, values] of Object.entries(item.readings)) {
+          html += `<tr><td>${name}</td>` + regions.map(r => `<td>${values[r]}</td>`).join("") + "</tr>";
+        }
+        table.innerHTML = html;
+      })
+      .catch(err => {
+        document.getElementById("time").textContent = "Failed to load data: " + err;
+      });
+  </script>
+</body>
+</html>
